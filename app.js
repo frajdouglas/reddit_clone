@@ -1,6 +1,6 @@
 const express = require('express');
 const apiRouter = require('./routes/api-router.js')
-const {handle500Errors,handleCustomErrors} = require('./controllers/errors.controllers.js')
+const {handle500Errors,handleCustomErrors} = require('./controllers/errors.controller.js')
 const app = express();
 
 app.use(express.json());

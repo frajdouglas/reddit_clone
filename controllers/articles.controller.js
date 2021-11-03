@@ -1,16 +1,20 @@
-const {selectTopics, updateArticle} = require('../models/api.model')
-const {selectArticlesByParam} = require('../models/api.model')
+const {updateArticle, selectArticlesByParam, selectAndGroupByArticles} = require('../models/articles.model')
 
 
-exports.getTopics = (req,res,next) => {
-    console.log("In Controllers getTopics")
-    selectTopics()
+exports.getAllArticles = (req,res,next) => {
+    console.log("In Controllers getAllArticles")
+    console.log(req.query)
+    //const queries = Object.keys(req.query)
+    //const optionValue = req.query[queryType]
+    selectAndGroupByArticles(req.query)
     .then((databaseResponse) => {
-        console.log("In the controller")
-        //console.log(databaseResponse, "Database Response")
-        res.status(200).send(databaseResponse);
+        res.status(200).send({articles : databaseResponse})
+    })
+    .catch((err) => {
+        next(err)
     })
 }
+
 
 exports.getArticles = (req,res,next) => {
     console.log("In Controllers getArticles")
@@ -36,7 +40,6 @@ exports.patchArticle = (req,res,next) => {
     
     updateArticle(inc_votes,article_id)
     .then((databaseResponse) => {
-        console.log(databaseResponse)
         res.status(201).send({updatedArticle : databaseResponse}) 
     })
     .catch((err) => {
