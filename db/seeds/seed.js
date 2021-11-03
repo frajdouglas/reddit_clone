@@ -3,12 +3,10 @@ const format = require('pg-format');
 
 
 const seed = (data) => {
-  console.log("IN THE SEED FUNCTION")
   const { articleData, commentData, topicData, userData } = data;
   return db
   .query(`DROP TABLE IF EXISTS comments;`)
   .then(() => {
-    console.log("DROPPING THE COMMENTS TABLE")
     return db
     .query(`DROP TABLE IF EXISTS articles;`)
   })
@@ -47,7 +45,7 @@ const seed = (data) => {
       votes INT  DEFAULT 0,
       topic VARCHAR NOT NULL,
       author VARCHAR NOT NULL,
-      created_at TIMESTAMP NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (topic)  REFERENCES topics(slug),
       FOREIGN KEY (author)  REFERENCES users(username)
     );`)
@@ -60,13 +58,14 @@ const seed = (data) => {
       author VARCHAR NOT NULL,
       article_id INT NOT NULL,
       votes INT DEFAULT 0,
-      created_at TIMESTAMP NOT NULL,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
       body TEXT NOT NULL,
       FOREIGN KEY (author)  REFERENCES users(username),
       FOREIGN KEY (article_id)  REFERENCES articles(article_id)
     );`)
     })
     .then(() => {
+
       const queryStr = format(`INSERT INTO topics
       (slug, description)
       VALUES %L RETURNING*;`, topicData.map(item => [
