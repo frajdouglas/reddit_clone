@@ -3,7 +3,6 @@ const testData = require('../db/data/test-data/index.js');
 const seed = require('../db/seeds/seed.js');
 const request = require('supertest')
 const app = require('../app');
-const topicsRouter = require('../routes/topics-router.js');
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -251,7 +250,6 @@ describe('APP', () => {
         })
     })
 
-
     describe('PATCH', () => {
         describe('/api/articles/:article_id', () => {
             test('status 201, successful patch', () => {
@@ -302,7 +300,7 @@ describe('APP', () => {
     })
 
     describe('POST', () => {
-        describe.only('/api/articles/:article_id/comments', () => {
+        describe('/api/articles/:article_id/comments', () => {
             test('status 201, successful post', () => {
                 const postData = {
                     username: 'rogersop',
@@ -325,10 +323,45 @@ describe('APP', () => {
                         })
                     })
             })
+            test('status 400, post data incorrect format', () => {
+                const postData = {
+                    username: 'rogersop',
+                    boody: 'nasty vitriol'
+                }
+                return request(app)
+                    .post('/api/articles/999/comments')
+                    .send(postData)
+                    .expect(400)
+                    .expect(({ text }) => {
+                        // UNSURE WHY MY ERROR MESSAGE ISN'T BEING SENT LIKE NORMAL FOR THIS BAD PATH
+                        expect(text).toBe("{\"msg\":\"Bad request\"}")
+                    })
+            })
         })
+
+
 
 
     })
 
+    describe('DELETE', () => {
+        describe('/api/comments/:comment_id', () => {
+            test('status 204, successfully deleted comment', () => {
+                return request(app)
+                    .delete('/api/comments/1')
+                    .expect(204)
+            })
+            test('status 404, comment_id not found', () => {
+                return request(app)
+                    .delete('/api/comments/999')
+                    .expect(404)
+                    .then(({ body }) => {
+                        expect(body).toEqual(
+                            { msg: 'Comment_id does not exist' }
+                        )
+                    })
+            })
 
+        })
+    })
 })

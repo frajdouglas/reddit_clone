@@ -1,8 +1,7 @@
-const { query } = require('../db/connection.js');
 const db = require('../db/connection.js');
 
 exports.selectArticlesByParam = (article_id) => {
-    console.log("In Models selectArticlesByParam")
+    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION selectArticlesByParam")
     const queryStatement = `SELECT * FROM articles WHERE article_id = $1`
     return db.query(queryStatement, [article_id])
         .then(({ rows }) => {
@@ -28,9 +27,8 @@ exports.selectArticlesByParam = (article_id) => {
 }
 
 exports.updateArticle = (patchData, article_id) => {
-    console.log("In Models updateArticle")
+    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION updateArticle")
     const queryStatement = `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`
-    console.log(queryStatement)
     return db.query(queryStatement, [patchData, article_id])
         .then((results) => {
             if (results.rows[0].votes === null) {
@@ -44,17 +42,13 @@ exports.updateArticle = (patchData, article_id) => {
 }
 
 exports.selectAndGroupByArticles = (queryObject) => {
-    console.log("In Models selectAndGroupByArticles")
+    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION selectAndGroupByArticles")
     let queryStatement = ''
     let databaseQuery = ''
     let queries = Object.keys(queryObject)
     let queryParams = Object.values(queryObject)
-    console.log(queries, "Queries")
-    console.log(queryParams, "QueryParams")
-
 
     if (queries.length === 0 && queryParams.length === 0) {
-        console.log("NO QUERY DETECTED")
         queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
                             FROM articles
                             LEFT JOIN comments
@@ -62,10 +56,7 @@ exports.selectAndGroupByArticles = (queryObject) => {
                             GROUP BY articles.article_id;`
 
         databaseQuery = db.query(queryStatement)
-
     } else {
-
-        //Parameters are not supported in ORDER BY clauses in psql so must sanitise statements without use of literal inputs.
         let orderColumn = queryObject.sort_by
         let sortDirection = queryObject.order
         let topicFilter = queryObject.topic
@@ -76,11 +67,8 @@ exports.selectAndGroupByArticles = (queryObject) => {
         if (sortDirection === '' || sortDirection === undefined) {
             sortDirection = 'DESC'
         }
-        console.log(orderColumn, "ORDER COLUMN")
-        console.log(sortDirection, "SORT DIRECTION")
 
         if (!['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'].includes(orderColumn)) {
-            console.log("REJECT ME")
             return Promise.reject({ status: 400, msg: 'Bad request' })
         }
 
@@ -104,10 +92,8 @@ exports.selectAndGroupByArticles = (queryObject) => {
             ORDER BY articles.${orderColumn} ${sortDirection};`
 
             databaseQuery = db.query(queryStatement, [topicFilter])
-
         }
     }
-    console.log(queryStatement, 'QUERYSTATEMENT')
     return databaseQuery
         .then(({ rows }) => {
             return rows

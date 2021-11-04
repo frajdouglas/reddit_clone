@@ -2,9 +2,7 @@ const {getArticles, patchArticle, getAllArticles} = require('../controllers/arti
 const {getCommentsByArticle,addComment} = require('../controllers/comments.controller');
 const articlesRouter = require('express').Router();
 
-
-console.log('In the articles-router')
-
+console.log('IN THE ARTICLES ROUTER')
 
 articlesRouter
 .route('/')

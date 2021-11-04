@@ -2,10 +2,7 @@ const {updateArticle, selectArticlesByParam, selectAndGroupByArticles} = require
 
 
 exports.getAllArticles = (req,res,next) => {
-    console.log("In Controllers getAllArticles")
-    console.log(req.query)
-    //const queries = Object.keys(req.query)
-    //const optionValue = req.query[queryType]
+    console.log("IN THE ARTICLES CONTROLLERS FILE IN THE FUNCTION getAllArticles")
     selectAndGroupByArticles(req.query)
     .then((databaseResponse) => {
         res.status(200).send({articles : databaseResponse})
@@ -17,9 +14,8 @@ exports.getAllArticles = (req,res,next) => {
 
 
 exports.getArticles = (req,res,next) => {
-    console.log("In Controllers getArticles")
+    console.log("IN THE ARTICLES CONTROLLERS FILE IN THE FUNCTION getArticles")
     const {article_id} = req.params 
-
     selectArticlesByParam(article_id)
     .then((databaseResponse) => {
         res.status(200).send({articles : databaseResponse})
@@ -30,14 +26,9 @@ exports.getArticles = (req,res,next) => {
 }
 
 exports.patchArticle = (req,res,next) => {
-    console.log("In Controllers patchArticle")
-
-    console.log(req.body)
+    console.log("IN THE ARTICLES CONTROLLERS FILE IN THE FUNCTION patchArticle")
     const {inc_votes} = req.body
-
     const {article_id} = req.params 
-    console.log(inc_votes,"PATCHDATA")
-    
     updateArticle(inc_votes,article_id)
     .then((databaseResponse) => {
         res.status(201).send({updatedArticle : databaseResponse}) 

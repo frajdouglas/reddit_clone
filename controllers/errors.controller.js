@@ -1,9 +1,6 @@
 
-
-
 exports.handleCustomErrors = (err, req, res, next) => {
-    console.log("In the Error Controller, handleCustomErrors")
-    console.log(err)
+    console.log("IN THE ERRORS CONTROLLERS FILE IN THE FUNCTION handleCustomErrors")
     if (err.status === 400 && err.msg === 'Bad request'){
         res.status(400).send({ msg: err.msg })
     }
@@ -18,11 +15,7 @@ exports.handleCustomErrors = (err, req, res, next) => {
     }
 }
 
-
-// Put me at the bottom
-
-
 exports.handle500Errors = (err, req, res, next) => {
-
+    console.log("IN THE ERRORS CONTROLLERS FILE IN THE FUNCTION handle500Errors")
         res.status(500).send({ msg: 'Internal server error' })
 }
