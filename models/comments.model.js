@@ -18,3 +18,13 @@ exports.selectCommentsByArticle = (article_id) => {
         return rows
     })
 }
+
+exports.insertComment = (article_id,username,body) => {
+    console.log("In the comments model insert comment function")
+    console.log(article_id,username,body)
+    const queryStatement = `INSERT INTO comments (article_id,author,body) VALUES ($1,$2,$3) RETURNING *;`
+    return db.query(queryStatement,[article_id,username,body])
+    .then(({rows}) => {
+        return rows
+    })
+}
