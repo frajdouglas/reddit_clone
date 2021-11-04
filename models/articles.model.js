@@ -46,6 +46,7 @@ exports.updateArticle = (patchData, article_id) => {
 exports.selectAndGroupByArticles = (queryObject) => {
     console.log("In Models selectAndGroupByArticles")
     let queryStatement = ''
+    let databaseQuery = ''
     let queries = Object.keys(queryObject)
     let queryParams = Object.values(queryObject)
     console.log(queries, "Queries")
@@ -60,6 +61,8 @@ exports.selectAndGroupByArticles = (queryObject) => {
                             ON comments.article_id = articles.article_id
                             GROUP BY articles.article_id;`
 
+        databaseQuery = db.query(queryStatement)
+
     } else {
 
         //Parameters are not supported in ORDER BY clauses in psql so must sanitise statements without use of literal inputs.
@@ -70,7 +73,7 @@ exports.selectAndGroupByArticles = (queryObject) => {
         if (orderColumn === '' || orderColumn === undefined) {
             orderColumn = 'created_at'
         }
-        if (sortDirection === '' || orderColumn === undefined) {
+        if (sortDirection === '' || sortDirection === undefined) {
             sortDirection = 'DESC'
         }
         console.log(orderColumn, "ORDER COLUMN")
@@ -81,37 +84,31 @@ exports.selectAndGroupByArticles = (queryObject) => {
             return Promise.reject({ status: 400, msg: 'Bad request' })
         }
 
-        queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
-                            FROM articles
-                            LEFT JOIN comments
-                            ON comments.article_id = articles.article_id
-                            GROUP BY articles.article_id
-                            ORDER BY articles.${orderColumn} ${sortDirection};`
-
-
-        if(topicFilter === '' || topicFilter === undefined){
+        if (topicFilter === '' || topicFilter === undefined) {
             queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
             FROM articles
             LEFT JOIN comments
             ON comments.article_id = articles.article_id
             GROUP BY articles.article_id
             ORDER BY articles.${orderColumn} ${sortDirection};`
+
+            databaseQuery = db.query(queryStatement)
+
+        } else {
+            queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
+            FROM articles
+            LEFT JOIN comments
+            ON comments.article_id = articles.article_id
+            WHERE topic = $1
+            GROUP BY articles.article_id
+            ORDER BY articles.${orderColumn} ${sortDirection};`
+
+            databaseQuery = db.query(queryStatement, [topicFilter])
+
         }
-        //  else {
-        //     queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
-        //     FROM articles
-        //     LEFT JOIN comments
-        //     ON comments.article_id = articles.article_id
-        //     WHERE topic = $1
-        //     GROUP BY articles.article_id
-        //     ORDER BY articles.${orderColumn} ${sortDirection};`   
-        // }
     }
-
-
-
     console.log(queryStatement, 'QUERYSTATEMENT')
-    return db.query(queryStatement)
+    return databaseQuery
         .then(({ rows }) => {
             return rows
         })

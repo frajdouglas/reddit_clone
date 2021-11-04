@@ -7,4 +7,5 @@ console.log('In the api-router')
 apiRouter.use('/topics', topicsRouter);
 apiRouter.use('/articles', articlesRouter);
 
+
 module.exports = apiRouter;

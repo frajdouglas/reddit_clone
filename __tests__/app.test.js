@@ -86,6 +86,7 @@ describe('APP', () => {
                     })
             })
         })
+
         describe('/api/articles', () => {
             test('status 200, data delivered successfully with no query', () => {
                 return request(app)
@@ -115,7 +116,7 @@ describe('APP', () => {
                     .then(({ body }) => {
                         console.log(body)
                         expect(body.articles).not.toEqual([])
-                        expect(body.articles).toBeSortedBy('author');
+                        expect(body.articles).toBeSortedBy('author', { descending: true });
                         body.articles.forEach((element) => {
                             expect(element).toEqual(
                                 expect.objectContaining({
@@ -138,7 +139,7 @@ describe('APP', () => {
                     .then(({ body }) => {
                         console.log(body)
                         expect(body.articles).not.toEqual([])
-                        expect(body.articles).toBeSortedBy('created_at');
+                        expect(body.articles).toBeSortedBy('created_at', { descending: true });
                         body.articles.forEach((element) => {
                             expect(element).toEqual(
                                 expect.objectContaining({
@@ -163,7 +164,7 @@ describe('APP', () => {
                         expect(body.msg).toBe('Bad request')
                     })
             })
-            test.only('status 200, data delivered successfully with "order" query', () => {
+            test('status 200, data delivered successfully with "order" query', () => {
                 return request(app)
                     .get('/api/articles?order=ASC')
                     .expect(200)
@@ -187,77 +188,115 @@ describe('APP', () => {
 
                     })
             })
-            test.only('status 200, data delivered successfully with "topic" query', () => {
+            test('status 200, data delivered successfully with "topic" query', () => {
                 return request(app)
-                    .get('/api/articles?topic=mitch')
+                    .get('/api/articles?topic=cats')
                     .expect(200)
                     .then(({ body }) => {
                         console.log(body)
                         expect(body.articles).not.toEqual([]);
                         expect(body.articles).toBeSortedBy('created_at', { descending: true });
-                        body.articles.forEach((element) => {
-                            expect(element).toEqual(
-                                expect.objectContaining({
-                                    article_id: expect.any(Number),
-                                    author: expect.any(String),
-                                    title: expect.any(String),
-                                    topic: expect.any(String),
-                                    created_at: expect.any(String),
-                                    votes: expect.any(Number),
-                                    comment_count: expect.any(String)
-                                })
-                            )
-                        })
-
+                        expect(body.articles).toEqual(
+                            [{
+                                article_id: 5,
+                                title: 'UNCOVERED: catspiracy to bring down democracy',
+                                topic: 'cats',
+                                author: 'rogersop',
+                                created_at: new Date(1596464040000).toISOString(),
+                                votes: 0,
+                                comment_count: "2"
+                            }]
+                        )
                     })
             })
+        })
 
-            describe('PATCH', () => {
-                describe('/api/articles/:article_id', () => {
-                    test('status 201, successful patch', () => {
-                        const patchRequest = { inc_votes: 1 }
-                        return request(app)
-                            .patch('/api/articles/1')
-                            .send(patchRequest)
-                            .expect(201)
-                            .expect(({ body }) => {
-                                expect(body).toEqual(
-                                    {
-                                        updatedArticle: [{
-                                            article_id: 1,
-                                            title: 'Living in the shadow of a great man',
-                                            topic: 'mitch',
-                                            author: 'butter_bridge',
-                                            body: 'I find this existence challenging',
-                                            created_at: new Date(1594329060000).toISOString(),
-                                            votes: 101,
-                                        }]
-                                    }
-                                )
-                            })
+        describe.only('/api/articles/:article_id/comments', () => {
+            test('status 200, data delivered successfully for given article_id', () => {
+                return request(app)
+                    .get('/api/articles/3/comments')
+                    .expect(200)
+                    .then(({ body }) => {
+                        expect(body.comments).toEqual(
+                            [{
+                                comment_id : 10,
+                                body: "git push origin master",
+                                votes: 0,
+                                author: "icellusedkars",
+                                article_id: 3,
+                                created_at: new Date(1592641440000).toISOString()
+                            },
+                            {
+                                comment_id : 11,
+                                body: "Ambidextrous marsupial",
+                                votes: 0,
+                                author: "icellusedkars",
+                                article_id: 3,
+                                created_at: new Date(1600560600000).toISOString()
+                            }]
+                        )
                     })
-                    test('status 400, bad key in patch data', () => {
-                        const patchRequest = { badRequest: 1 }
-                        return request(app)
-                            .patch('/api/articles/1')
-                            .send(patchRequest)
-                            .expect(400)
-                            .expect(({ body }) => {
-                                expect(body).toEqual(
-                                    { msg: "Bad request" }
-                                )
-                            })
+            })
+            test('status 404, data does not exist for given id', () => {
+                return request(app)
+                    .get('/api/articles/999/comments')
+                    .expect(404)
+                    .then(({ body }) => {
+                        expect(body).toEqual(
+                            { msg: 'Article_id does not exist' }
+                        )
                     })
-                    test('status 400, bad value in patch data', () => {
-                        const patchRequest = { inc_votes: 'badData' }
-                        return request(app)
-                            .patch('/api/articles/1')
-                            .send(patchRequest)
-                            .expect(400)
-                            .expect(({ body }) => {
-                                expect(body.msg).toBe("Invalid Input")
-                            })
-                    })
+            })
+            
+        })
+
+
+
+        describe('PATCH', () => {
+            describe('/api/articles/:article_id', () => {
+                test('status 201, successful patch', () => {
+                    const patchRequest = { inc_votes: 1 }
+                    return request(app)
+                        .patch('/api/articles/1')
+                        .send(patchRequest)
+                        .expect(201)
+                        .expect(({ body }) => {
+                            expect(body).toEqual(
+                                {
+                                    updatedArticle: [{
+                                        article_id: 1,
+                                        title: 'Living in the shadow of a great man',
+                                        topic: 'mitch',
+                                        author: 'butter_bridge',
+                                        body: 'I find this existence challenging',
+                                        created_at: new Date(1594329060000).toISOString(),
+                                        votes: 101,
+                                    }]
+                                }
+                            )
+                        })
+                })
+                test('status 400, bad key in patch data', () => {
+                    const patchRequest = { badRequest: 1 }
+                    return request(app)
+                        .patch('/api/articles/1')
+                        .send(patchRequest)
+                        .expect(400)
+                        .expect(({ body }) => {
+                            expect(body).toEqual(
+                                { msg: "Bad request" }
+                            )
+                        })
+                })
+                test('status 400, bad value in patch data', () => {
+                    const patchRequest = { inc_votes: 'badData' }
+                    return request(app)
+                        .patch('/api/articles/1')
+                        .send(patchRequest)
+                        .expect(400)
+                        .expect(({ body }) => {
+                            expect(body.msg).toBe("Invalid Input")
+                        })
                 })
             })
         })
