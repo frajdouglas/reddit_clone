@@ -63,32 +63,54 @@ exports.selectAndGroupByArticles = (queryObject) => {
     } else {
 
         //Parameters are not supported in ORDER BY clauses in psql so must sanitise statements without use of literal inputs.
-       let orderColumn = queryObject.sort_by
-       if(orderColumn === ''){
-           orderColumn = 'created_at'
-       }
-       console.log(orderColumn, "ORDER COLUMN")
+        let orderColumn = queryObject.sort_by
+        let sortDirection = queryObject.order
+        let topicFilter = queryObject.topic
 
-       queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
+        if (orderColumn === '' || orderColumn === undefined) {
+            orderColumn = 'created_at'
+        }
+        if (sortDirection === '' || orderColumn === undefined) {
+            sortDirection = 'DESC'
+        }
+        console.log(orderColumn, "ORDER COLUMN")
+        console.log(sortDirection, "SORT DIRECTION")
+
+        if (!['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count'].includes(orderColumn)) {
+            console.log("REJECT ME")
+            return Promise.reject({ status: 400, msg: 'Bad request' })
+        }
+
+        queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
                             FROM articles
                             LEFT JOIN comments
                             ON comments.article_id = articles.article_id
                             GROUP BY articles.article_id
-                            ORDER BY articles.${orderColumn};`
+                            ORDER BY articles.${orderColumn} ${sortDirection};`
 
-       
-       
-        console.log(orderColumn)
-        if(!['author','title','article_id','topic','created_at','votes','comment_count'].includes(orderColumn)){
-            console.log("REJECT ME")
-            return Promise.reject({status:400, msg:'Bad request'})
+
+        if(topicFilter === '' || topicFilter === undefined){
+            queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
+            FROM articles
+            LEFT JOIN comments
+            ON comments.article_id = articles.article_id
+            GROUP BY articles.article_id
+            ORDER BY articles.${orderColumn} ${sortDirection};`
         }
-
+        //  else {
+        //     queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
+        //     FROM articles
+        //     LEFT JOIN comments
+        //     ON comments.article_id = articles.article_id
+        //     WHERE topic = $1
+        //     GROUP BY articles.article_id
+        //     ORDER BY articles.${orderColumn} ${sortDirection};`   
+        // }
     }
 
 
 
-    console.log(queryStatement,'QUERYSTATEMENT')
+    console.log(queryStatement, 'QUERYSTATEMENT')
     return db.query(queryStatement)
         .then(({ rows }) => {
             return rows

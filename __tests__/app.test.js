@@ -108,7 +108,7 @@ describe('APP', () => {
                         })
                     })
             })
-            test.only('status 200, data delivered successfully with "sort_by" query', () => {
+            test('status 200, data delivered successfully with "sort_by" query', () => {
                 return request(app)
                     .get('/api/articles?sort_by=author')
                     .expect(200)
@@ -131,7 +131,7 @@ describe('APP', () => {
                         })
                     })
             })
-            test.only('status 200, data delivered successfully with "sort_by" query and defaults to created_at column', () => {
+            test('status 200, data delivered successfully with "sort_by" query and defaults to created_at column', () => {
                 return request(app)
                     .get('/api/articles?sort_by=')
                     .expect(200)
@@ -154,88 +154,112 @@ describe('APP', () => {
                         })
                     })
             })
-            test.only('status 400, not a column sent as sort_by query', () => {
+            test('status 400, not a column sent as sort_by query', () => {
                 return request(app)
                     .get('/api/articles?sort_by=DROP_DB')
                     .expect(400)
                     .then(({ body }) => {
                         console.log(body)
-                        expect(body.msg).toBe('Bad request')      
+                        expect(body.msg).toBe('Bad request')
+                    })
+            })
+            test.only('status 200, data delivered successfully with "order" query', () => {
+                return request(app)
+                    .get('/api/articles?order=ASC')
+                    .expect(200)
+                    .then(({ body }) => {
+                        console.log(body)
+                        expect(body.articles).not.toEqual([])
+                        expect(body.articles).toBeSortedBy('created_at', { descending: false });
+                        body.articles.forEach((element) => {
+                            expect(element).toEqual(
+                                expect.objectContaining({
+                                    article_id: expect.any(Number),
+                                    author: expect.any(String),
+                                    title: expect.any(String),
+                                    topic: expect.any(String),
+                                    created_at: expect.any(String),
+                                    votes: expect.any(Number),
+                                    comment_count: expect.any(String)
+                                })
+                            )
+                        })
+
+                    })
+            })
+            test.only('status 200, data delivered successfully with "topic" query', () => {
+                return request(app)
+                    .get('/api/articles?topic=mitch')
+                    .expect(200)
+                    .then(({ body }) => {
+                        console.log(body)
+                        expect(body.articles).not.toEqual([]);
+                        expect(body.articles).toBeSortedBy('created_at', { descending: true });
+                        body.articles.forEach((element) => {
+                            expect(element).toEqual(
+                                expect.objectContaining({
+                                    article_id: expect.any(Number),
+                                    author: expect.any(String),
+                                    title: expect.any(String),
+                                    topic: expect.any(String),
+                                    created_at: expect.any(String),
+                                    votes: expect.any(Number),
+                                    comment_count: expect.any(String)
+                                })
+                            )
+                        })
+
+                    })
+            })
+
+            describe('PATCH', () => {
+                describe('/api/articles/:article_id', () => {
+                    test('status 201, successful patch', () => {
+                        const patchRequest = { inc_votes: 1 }
+                        return request(app)
+                            .patch('/api/articles/1')
+                            .send(patchRequest)
+                            .expect(201)
+                            .expect(({ body }) => {
+                                expect(body).toEqual(
+                                    {
+                                        updatedArticle: [{
+                                            article_id: 1,
+                                            title: 'Living in the shadow of a great man',
+                                            topic: 'mitch',
+                                            author: 'butter_bridge',
+                                            body: 'I find this existence challenging',
+                                            created_at: new Date(1594329060000).toISOString(),
+                                            votes: 101,
+                                        }]
+                                    }
+                                )
+                            })
+                    })
+                    test('status 400, bad key in patch data', () => {
+                        const patchRequest = { badRequest: 1 }
+                        return request(app)
+                            .patch('/api/articles/1')
+                            .send(patchRequest)
+                            .expect(400)
+                            .expect(({ body }) => {
+                                expect(body).toEqual(
+                                    { msg: "Bad request" }
+                                )
+                            })
+                    })
+                    test('status 400, bad value in patch data', () => {
+                        const patchRequest = { inc_votes: 'badData' }
+                        return request(app)
+                            .patch('/api/articles/1')
+                            .send(patchRequest)
+                            .expect(400)
+                            .expect(({ body }) => {
+                                expect(body.msg).toBe("Invalid Input")
+                            })
+                    })
+                })
             })
         })
-        test.only('status 200, data delivered successfully with "order" query and defaults to created_at column', () => {
-            return request(app)
-                .get('/api/articles?sort_by=')
-                .expect(200)
-                .then(({ body }) => {
-                    console.log(body)
-                    expect(body.articles).not.toEqual([])
-                    expect(body.articles).toBeSortedBy('created_at');
-                    body.articles.forEach((element) => {
-                        expect(element).toEqual(
-                            expect.objectContaining({
-                                article_id: expect.any(Number),
-                                author: expect.any(String),
-                                title: expect.any(String),
-                                topic: expect.any(String),
-                                created_at: expect.any(String),
-                                votes: expect.any(Number),
-                                comment_count: expect.any(String)
-                            })
-                        )
-                    })
-                
-    
-    test('status 200, data delivered successfully with multiple queries', () => { })
-})
     })
-
-describe('PATCH', () => {
-    describe('/api/articles/:article_id', () => {
-        test('status 201, successful patch', () => {
-            const patchRequest = { inc_votes: 1 }
-            return request(app)
-                .patch('/api/articles/1')
-                .send(patchRequest)
-                .expect(201)
-                .expect(({ body }) => {
-                    expect(body).toEqual(
-                        {
-                            updatedArticle: [{
-                                article_id: 1,
-                                title: 'Living in the shadow of a great man',
-                                topic: 'mitch',
-                                author: 'butter_bridge',
-                                body: 'I find this existence challenging',
-                                created_at: new Date(1594329060000).toISOString(),
-                                votes: 101,
-                            }]
-                        }
-                    )
-                })
-        })
-        test('status 400, bad key in patch data', () => {
-            const patchRequest = { badRequest: 1 }
-            return request(app)
-                .patch('/api/articles/1')
-                .send(patchRequest)
-                .expect(400)
-                .expect(({ body }) => {
-                    expect(body).toEqual(
-                        { msg: "Bad request" }
-                    )
-                })
-        })
-        test('status 400, bad value in patch data', () => {
-            const patchRequest = { inc_votes: 'badData' }
-            return request(app)
-                .patch('/api/articles/1')
-                .send(patchRequest)
-                .expect(400)
-                .expect(({ body }) => {
-                    expect(body.msg).toBe("Invalid Input")
-                })
-        })
-    })
-})
 })
