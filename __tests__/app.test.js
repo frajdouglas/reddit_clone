@@ -12,13 +12,111 @@ describe('APP', () => {
         describe.only('/api', () => {
             test('status 200, data delivered successfully', () => {
                 return request(app)
-                .get('/api')
-                .expect(200)
-                .then((body) => {
-                    expect(body).toEqual({
-                        "something" : "data"
+                    .get('/api')
+                    .expect(200)
+                    .then(({ body }) => {
+                        expect(body).toEqual({
+                            "GET /api": {
+                                "description": "serves up a json representation of all the available endpoints of the api"
+                            },
+                            "GET /api/topics": {
+                                "description": "serves an array of all topics",
+                                "queries": [],
+                                "exampleResponse": {
+                                    "topics": [
+                                        {
+                                            "slug": "football",
+                                            "description": "Footie!"
+                                        }
+                                    ]
+                                }
+                            },
+                            "GET /api/articles": {
+                                "description": "serves an array of all topics",
+                                "queries": [
+                                    "author",
+                                    "topic",
+                                    "sort_by",
+                                    "order"
+                                ],
+                                "exampleResponse": {
+                                    "articles": [
+                                        {
+                                            "title": "Seafood substitutions are increasing",
+                                            "topic": "cooking",
+                                            "author": "weegembump",
+                                            "body": "Text from the article..",
+                                            "created_at": 1527695953341
+                                        }
+                                    ]
+                                }
+                            },
+                            "GET /api/articles/:article_id": {
+                                "description": "serves an object of specified article",
+                                "exampleResponse": {
+                                    "articles": {
+                                        "article_id": 1,
+                                        "title": "Living in the shadow of a great man",
+                                        "topic": "mitch",
+                                        "author": "butter_bridge",
+                                        "body": "I find this existence challenging",
+                                        "created_at": 1527695953341,
+                                        "votes": 100,
+                                        "comment_count": 11
+                                    }
+                                }
+                            },
+                            "PATCH /api/articles/:article_id": {
+                                "description": "Modifies the votes counter and responds with the updated article.",
+                                "exampleResponse": [
+                                    {
+                                        "updatedArticle": {
+                                            "article_id": 1,
+                                            "title": "Living in the shadow of a great man",
+                                            "topic": "mitch",
+                                            "author": "butter_bridge",
+                                            "body": "I find this existence challenging",
+                                            "created_at": 1527695953341,
+                                            "votes": 101
+                                        }
+                                    }
+                                ]
+                            },
+                            "GET /api/articles/:article_id/comments": {
+                                "description": "Serves array of comments for give article_id.",
+                                "exampleResponse": {
+                                    "comments": [
+                                        {
+                                            "comment_id": 10,
+                                            "body": "git push origin master",
+                                            "votes": 0,
+                                            "author": "icellusedkars",
+                                            "article_id": 3,
+                                            "created_at": 1527695953341
+                                        }
+                                    ]
+                                }
+                            },
+                            "POST /api/articles/:article_id/comments": {
+                                "description": "Adds comment to specified article and responds with added comment.",
+                                "exampleResponse": {
+                                    "addedComment": [
+                                        {
+                                            "comment_id": 19,
+                                            "author": "alan",
+                                            "article_id": 1,
+                                            "votes": 0,
+                                            "created_at": 1527695953341,
+                                            "body": "vitriol"
+                                        }
+                                    ]
+                                }
+                            },
+                            "DELETE /api/comments/:comment_id": {
+                                "description": "Deletes specified comment, if successful responds with 204 HTTP status code"
+                            }
+                        })
                     })
-                })
             })
         })
         describe('/api/topics', () => {
