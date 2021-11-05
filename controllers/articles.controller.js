@@ -31,7 +31,7 @@ exports.patchArticle = (req,res,next) => {
     const {article_id} = req.params 
     updateArticle(inc_votes,article_id)
     .then((databaseResponse) => {
-        res.status(201).send({updatedArticle : databaseResponse}) 
+        res.status(200).send({updatedArticle : databaseResponse}) 
     })
     .catch((err) => {
         next(err)

@@ -72,6 +72,12 @@ exports.selectAndGroupByArticles = (queryObject) => {
             return Promise.reject({ status: 400, msg: 'Bad request' })
         }
 
+        if(!['DESC','ASC'].includes(sortDirection)) {
+            return Promise.reject({ status: 400, msg: 'Bad request' })
+        }
+
+
+
         if (topicFilter === '' || topicFilter === undefined) {
             queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
             FROM articles
@@ -82,6 +88,8 @@ exports.selectAndGroupByArticles = (queryObject) => {
 
             databaseQuery = db.query(queryStatement)
 
+        } else if(!['mitch','cats','paper'].includes(topicFilter)) {
+                return Promise.reject({ status: 400, msg: 'Bad request' })
         } else {
             queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
             FROM articles
