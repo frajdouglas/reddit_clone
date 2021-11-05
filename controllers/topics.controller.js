@@ -9,4 +9,6 @@ exports.getTopics = (req,res,next) => {
     .then((databaseResponse) => {
         res.status(200).send(databaseResponse);
     })
+    .catch(next)
+
 }

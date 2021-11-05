@@ -9,14 +9,7 @@ exports.getCommentsByArticle = (req, res, next) => {
         .then((rows) => {
             res.status(200).send({ comments: rows })
         })
-        .catch((err) => {
-            if (err.status === 400 && err.msg === 'Bad request') {
-                res.status(400).send({ msg: err.msg })
-            } else {
-                res.status(404).send({ msg: err.msg })
-            }
-
-        })
+        .catch(next)
 }
 
 exports.addComment = (req, res, next) => {
@@ -24,15 +17,14 @@ exports.addComment = (req, res, next) => {
     const { article_id } = req.params
     const { username } = req.body
     const { body } = req.body
-    if (req.body.username === undefined || req.body.body === undefined) {
-        res.status(400).send({ msg: 'Bad request' })
-    } else {
-        insertComment(article_id, username, body)
-            .then((databaseResponse) => {
-                res.status(201).send({ addedComment: databaseResponse })
-            })
-    }
+
+    insertComment(article_id, username, body)
+        .then((databaseResponse) => {
+            res.status(201).send({ addedComment: databaseResponse })
+        })
+        .catch(next)
 }
+
 
 exports.removeComment = (req, res, next) => {
     console.log("IN THE COMMENTS CONTROLLERS FILE IN THE FUNCTION removeComment")
@@ -41,7 +33,5 @@ exports.removeComment = (req, res, next) => {
         .then(() => {
             res.status(204).send()
         })
-        .catch((err) => {
-            next(err)
-        })
+        .catch(next)
 }

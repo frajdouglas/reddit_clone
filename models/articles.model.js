@@ -1,7 +1,7 @@
 const db = require('../db/connection.js');
 
 exports.selectArticlesByParam = (article_id) => {
-    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION selectArticlesByParam")
+    console.log("IN THE ARTICLES MODELS CONTROLLERS FILE IN THE FUNCTION selectArticlesByParam")
     const queryStatement = `SELECT * FROM articles WHERE article_id = $1`
     return db.query(queryStatement, [article_id])
         .then(({ rows }) => {

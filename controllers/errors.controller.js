@@ -1,10 +1,15 @@
 
 exports.handleCustomErrors = (err, req, res, next) => {
+    console.log(err)
     console.log("IN THE ERRORS CONTROLLERS FILE IN THE FUNCTION handleCustomErrors")
     if (err.status === 400 && err.msg === 'Bad request'){
         res.status(400).send({ msg: err.msg })
     }
     
+    if(err.code === '23503') {
+        res.status(404).send({ msg: 'ID does not exist' })
+    }
+
     if(err.code === '22P02') {
         res.status(400).send({ msg: 'Invalid Input' })
     }

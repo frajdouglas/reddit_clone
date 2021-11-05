@@ -7,9 +7,7 @@ exports.getAllArticles = (req,res,next) => {
     .then((databaseResponse) => {
         res.status(200).send({articles : databaseResponse})
     })
-    .catch((err) => {
-        next(err)
-    })
+    .catch(next)
 }
 
 
@@ -20,9 +18,7 @@ exports.getArticles = (req,res,next) => {
     .then((databaseResponse) => {
         res.status(200).send({articles : databaseResponse})
     })
-    .catch((err) => {
-        next(err)
-    })
+    .catch(next)
 }
 
 exports.patchArticle = (req,res,next) => {
@@ -33,7 +29,5 @@ exports.patchArticle = (req,res,next) => {
     .then((databaseResponse) => {
         res.status(200).send({updatedArticle : databaseResponse}) 
     })
-    .catch((err) => {
-        next(err)
-    })
+    .catch(next)
 }

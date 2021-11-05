@@ -21,9 +21,17 @@ exports.selectCommentsByArticle = (article_id) => {
 
 exports.insertComment = (article_id, username, body) => {
     console.log("IN THE COMMENTS MODEL FILE IN THE FUNCTION insertComment")
+    if (username === undefined || body === undefined) {
+        return Promise.reject({
+            status: 400,
+            msg: 'Bad request'})
+        }
+        
+
+
     const queryStatement = `INSERT INTO comments (article_id,author,body) VALUES ($1,$2,$3) RETURNING *;`
     return db.query(queryStatement, [article_id, username, body])
-        .then(({ rows }) => {
+        .then(({rows}) => {
             return rows
         })
 }

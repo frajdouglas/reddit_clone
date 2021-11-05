@@ -296,6 +296,7 @@ describe('APP', () => {
                             expect(body.msg).toBe('Bad request')
                         })
                 })
+
         })
 
         describe('/api/articles/:article_id', () => {
@@ -454,7 +455,7 @@ describe('APP', () => {
     })
 
     describe('POST', () => {
-        describe.only('/api/articles/:article_id/comments', () => {
+        describe('/api/articles/:article_id/comments', () => {
             test('status 201, successful post', () => {
                 const postData = {
                     username: 'rogersop',
@@ -513,17 +514,30 @@ describe('APP', () => {
                         expect(body.msg).toBe("Bad request")
                     })
             })
-            test.only('Status 404, username does not exist', () => {
+            test('Status 404, username does not exist', () => {
                 const postData = {
                     username: 'frasd',
                     body: 'nasty vitriol'
                 }
                 return request(app)
-                    .post('/api/articles/999/comments')
+                    .post('/api/articles/1/comments')
                     .send(postData)
-                    .expect(400)
+                    .expect(404)
                     .expect(({ body }) => {
-                        expect(body.msg).toBe("Bad request")
+                        expect(body.msg).toBe("ID does not exist")
+                    })
+            })
+            test('Status 404, non existent ID, e.g. 0 or 9999', () => {
+                const postData = {
+                    username: 'rogersop',
+                    body: 'nasty vitriol'
+                }
+                return request(app)
+                    .post('/api/articles/9991/comments')
+                    .send(postData)
+                    .expect(404)
+                    .expect(({ body }) => {
+                        expect(body.msg).toBe("ID does not exist")
                     })
             })
         })
