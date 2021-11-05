@@ -9,6 +9,18 @@ afterAll(() => db.end());
 
 describe('APP', () => {
     describe('GET', () => {
+        describe.only('/api', () => {
+            test('status 200, data delivered successfully', () => {
+                return request(app)
+                .get('/api')
+                .expect(200)
+                .then((body) => {
+                    expect(body).toEqual({
+                        "something" : "data"
+                    })
+                })
+            })
+        })
         describe('/api/topics', () => {
             test('status 200, data delivered successfully', () => {
                 return request(app)

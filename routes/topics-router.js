@@ -1,7 +1,7 @@
 const { getTopics } = require('../controllers/topics.controller');
 const topicsRouter = require('express').Router();
 
-console.log('In the topics-router')
+console.log('In the TOPICS ROUTER')
 
 topicsRouter
 .route('/')
