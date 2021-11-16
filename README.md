@@ -19,8 +19,8 @@ The project mimics the real world backend service Reddit uses which serves up da
 -Install dependencies\
 -Create .env files in root directory and set PGDATABASE to nc_news and nc_news_test\
 -Setup local databases \
--Seed local database\
--Run tests\
+-Seed local database \
+-Run tests
 
 Copy the commands below to complete the setup for this project:
 You must have the minimum versions of Node.js and Postgres installed before running these commands.
