@@ -13,14 +13,14 @@ The project mimics the real world backend service Reddit uses which serves up da
 
 ## Instructions for setup
 
--The minimum version of Node.js required is: v17.0.0
--The minimum version of Postgres required is: v12.8
--Clone repo into your desired directory.
--Install dependencies
--Create .env files in root directory and set PGDATABASE to nc_news and nc_news_test.
--Setup local databases.
--Seed local database.
--Run tests.
+-The minimum version of Node.js required is: v17.0.0\
+-The minimum version of Postgres required is: v12.8\
+-Clone repo into your desired directory\
+-Install dependencies\
+-Create .env files in root directory and set PGDATABASE to nc_news and nc_news_test\
+-Setup local databases \
+-Seed local database\
+-Run tests\
 
 Copy the commands below to complete the setup for this project:
 You must have the minimum versions of Node.js and Postgres installed before running these commands.
