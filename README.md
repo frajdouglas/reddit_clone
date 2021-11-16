@@ -22,8 +22,10 @@ The project mimics the real world backend service Reddit uses which serves up da
 -Seed local database \
 -Run tests
 
+
+You must have the minimum versions of Node.js and Postgres installed before running these commands. \
+
 Copy the commands below to complete the setup for this project:
-You must have the minimum versions of Node.js and Postgres installed before running these commands.
 
 ```
 git clone https://github.com/frajdouglas/reddit_clone.git
