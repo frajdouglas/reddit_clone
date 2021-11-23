@@ -287,15 +287,7 @@ describe('APP', () => {
                     .then(({ body }) => {
                         expect(body.msg).toBe('Bad request')
                     })
-            }),
-                test('status 400, invalid topic query', () => {
-                    return request(app)
-                        .get('/api/articles?topic=dogs')
-                        .expect(400)
-                        .then(({ body }) => {
-                            expect(body.msg).toBe('Bad request')
-                        })
-                })
+            })
 
         })
 
