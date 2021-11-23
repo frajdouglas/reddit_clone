@@ -27,7 +27,7 @@ exports.selectArticlesByParam = (article_id) => {
 }
 
 exports.updateArticle = (patchData, article_id) => {
-    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION updateArticle")
+    console.log("IN THE ARTICLES CONTROLLERS FILE IN THE FUNCTION updateArticle")
     const queryStatement = `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 RETURNING *;`
     return db.query(queryStatement, [patchData, article_id])
         .then((results) => {
@@ -42,12 +42,11 @@ exports.updateArticle = (patchData, article_id) => {
 }
 
 exports.selectAndGroupByArticles = (queryObject) => {
-    console.log("IN THE MODELS CONTROLLERS FILE IN THE FUNCTION selectAndGroupByArticles")
+    console.log("IN THE ARTICLES CONTROLLERS FILE IN THE FUNCTION selectAndGroupByArticles")
     let queryStatement = ''
     let databaseQuery = ''
     let queries = Object.keys(queryObject)
     let queryParams = Object.values(queryObject)
-
     if (queries.length === 0 && queryParams.length === 0) {
         queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
                             FROM articles
@@ -72,7 +71,7 @@ exports.selectAndGroupByArticles = (queryObject) => {
             return Promise.reject({ status: 400, msg: 'Bad request' })
         }
 
-        if(!['DESC','ASC'].includes(sortDirection)) {
+        if (!['DESC', 'ASC'].includes(sortDirection)) {
             return Promise.reject({ status: 400, msg: 'Bad request' })
         }
 
@@ -85,13 +84,11 @@ exports.selectAndGroupByArticles = (queryObject) => {
             ON comments.article_id = articles.article_id
             GROUP BY articles.article_id
             ORDER BY articles.${orderColumn} ${sortDirection};`
-
+            console.log(topicFilter, "topicFilter Detected as blank!")
             databaseQuery = db.query(queryStatement)
 
-        } else if(!['mitch','cats','paper'].includes(topicFilter)) {
-                return Promise.reject({ status: 400, msg: 'Bad request' })
-        } else {
-            queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
+    } else {
+        queryStatement = `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at , articles.votes ,COUNT(comment_id) AS comment_count 
             FROM articles
             LEFT JOIN comments
             ON comments.article_id = articles.article_id
@@ -99,11 +96,11 @@ exports.selectAndGroupByArticles = (queryObject) => {
             GROUP BY articles.article_id
             ORDER BY articles.${orderColumn} ${sortDirection};`
 
-            databaseQuery = db.query(queryStatement, [topicFilter])
-        }
+        databaseQuery = db.query(queryStatement, [topicFilter])
     }
-    return databaseQuery
-        .then(({ rows }) => {
-            return rows
-        })
+}
+return databaseQuery
+    .then(({ rows }) => {
+        return rows
+    })
 }
